@@ -14,9 +14,10 @@ cd_to_repo_root() {
 
 # Mirrors what `yarn run`/`npm run` do for their child processes, so locally
 # installed CLIs (e.g. tsx) can be invoked by name instead of their full
-# node_modules/.bin path.
+# node_modules/.bin path. Prepended unconditionally (even if the directory
+# doesn't exist yet) since bash resolves PATH entries at lookup time, so this
+# still works if dependencies are installed later in the same script.
 add_local_bin_to_path() {
-  [ -d node_modules/.bin ] || return 0
   export PATH="$PWD/node_modules/.bin:$PATH"
 }
 
@@ -84,6 +85,22 @@ activate_pinned_package_manager() {
 
   "$pm_name" --version >/dev/null 2>&1 \
     || echo "Warning: failed to activate $pm_spec via Corepack" >&2
+}
+
+# Not called automatically below, since it's only meant for scripts (like
+# bin/start) that run the app itself, not for bin/yarn, which forwards
+# arbitrary yarn commands (including `install`) and shouldn't install twice.
+#
+# `--immutable` refuses to modify yarn.lock, failing instead if it's out of
+# sync with package.json, so installs strictly adhere to what's committed.
+# Output is captured and only shown if the install fails, since yarn writes
+# both its routine progress and its failure diagnostics to stdout.
+ensure_dependencies_installed() {
+  local install_output
+  if ! install_output="$(yarn install --immutable 2>&1)"; then
+    echo "$install_output" >&2
+    return 1
+  fi
 }
 
 cd_to_repo_root
