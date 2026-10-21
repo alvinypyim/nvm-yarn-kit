@@ -42,7 +42,8 @@ load_nvm() {
 
 use_pinned_node_version() {
   if ! command -v nvm >/dev/null 2>&1; then
-    echo "Warning: nvm not found (expected at \$NVM_DIR=$NVM_DIR); using system node $(node -v)" >&2
+    echo "Warning: nvm not found (expected at \$NVM_DIR=$NVM_DIR);" \
+      "using system node $(node -v)" >&2
     return
   fi
 
@@ -70,7 +71,8 @@ read_pinned_package_manager() {
 
 activate_pinned_package_manager() {
   if ! command -v corepack >/dev/null 2>&1; then
-    echo "Warning: corepack not found; skipping packageManager activation from package.json" >&2
+    echo "Warning: corepack not found;" \
+      "skipping packageManager activation from package.json" >&2
     return
   fi
 
