@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# shellcheck source=bin/_env.sh
+# shellcheck source=_env.sh
 . "$(dirname "${BASH_SOURCE[0]}")/_env.sh"
 
-ensure_dependencies_installed
-
 [ $# -gt 0 ] || { echo "Usage: $0 <command> [args...]" >&2; exit 1; }
+
+ensure_dependencies_installed
 
 exec "$@"

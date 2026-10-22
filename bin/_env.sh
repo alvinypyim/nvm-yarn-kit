@@ -1,6 +1,7 @@
-# Shared setup sourced by scripts in bin/.
+# Shared setup sourced by the scripts in this directory.
 #
-# Changes the working directory to the repository root, loads nvm and
+# Changes the working directory to the project root (the parent of the
+# directory this kit is cloned into), loads nvm and
 # switches to the Node version pinned in .nvmrc, and activates the package
 # manager pinned in package.json's "packageManager" field via Corepack. The
 # sourcing script must already be running under `set -euo pipefail`. Not
@@ -9,7 +10,7 @@
 cd_to_repo_root() {
   local bin_dir
   bin_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  cd "$bin_dir/.."
+  cd "$bin_dir/../.."
 }
 
 # Mirrors what `yarn run`/`npm run` do for their child processes, so locally
@@ -25,10 +26,9 @@ add_local_bin_to_path() {
 # run them with `set -u` relaxed instead of weakening strict mode for the
 # rest of the script.
 run_with_unbound_vars_allowed() {
-  local exit_code
+  local exit_code=0
   set +u
-  "$@"
-  exit_code=$?
+  "$@" || exit_code=$?
   set -u
   return "$exit_code"
 }
@@ -55,7 +55,7 @@ use_pinned_node_version() {
   # `nvm install` when the pinned version genuinely isn't installed yet.
   run_with_unbound_vars_allowed nvm use >/dev/null 2>&1 && return 0
 
-  nvm install >/dev/null 2>&1
+  run_with_unbound_vars_allowed nvm install >/dev/null 2>&1
   run_with_unbound_vars_allowed nvm use >/dev/null
 }
 
