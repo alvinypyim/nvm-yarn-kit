@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.0
 
 - Moved scripts into `bin/`; clone the kit as `.nvm-yarn-kit`.
 - Added `README.md` and `CHANGELOG.md`.
