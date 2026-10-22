@@ -1,30 +1,13 @@
-# Shared setup sourced by the scripts in this directory.
-#
-# Changes the working directory to the project root (the parent of the
-# directory this kit is cloned into), loads nvm and
-# switches to the Node version pinned in .nvmrc, and activates the package
-# manager pinned in package.json's "packageManager" field via Corepack. The
-# sourcing script must already be running under `set -euo pipefail`. Not
-# meant to be executed directly.
-
-cd_to_repo_root() {
+cd_to_project_root() {
   local bin_dir
   bin_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   cd "$bin_dir/../.."
 }
 
-# Mirrors what `yarn run`/`npm run` do for their child processes, so locally
-# installed CLIs (e.g. tsx) can be invoked by name instead of their full
-# node_modules/.bin path. Prepended unconditionally (even if the directory
-# doesn't exist yet) since bash resolves PATH entries at lookup time, so this
-# still works if dependencies are installed later in the same script.
 add_local_bin_to_path() {
   export PATH="$PWD/node_modules/.bin:$PATH"
 }
 
-# nvm.sh, and some nvm subcommands, reference unset variables internally, so
-# run them with `set -u` relaxed instead of weakening strict mode for the
-# rest of the script.
 run_with_unbound_vars_allowed() {
   local exit_code=0
   set +u
@@ -49,10 +32,6 @@ use_pinned_node_version() {
 
   [ -f .nvmrc ] || return 0
 
-  # `nvm install` always hits the network to resolve the version, even when
-  # it's already installed, which is slow and has wildly variable latency.
-  # Try the fast, local-only `nvm use` first, and only fall back to
-  # `nvm install` when the pinned version genuinely isn't installed yet.
   run_with_unbound_vars_allowed nvm use >/dev/null 2>&1 && return 0
 
   run_with_unbound_vars_allowed nvm install >/dev/null 2>&1
@@ -89,14 +68,6 @@ activate_pinned_package_manager() {
     || echo "Warning: failed to activate $pm_spec via Corepack" >&2
 }
 
-# Not called automatically below, since it's only meant for scripts (like
-# bin/start) that run the app itself, not for bin/yarn, which forwards
-# arbitrary yarn commands (including `install`) and shouldn't install twice.
-#
-# `--immutable` refuses to modify yarn.lock, failing instead if it's out of
-# sync with package.json, so installs strictly adhere to what's committed.
-# Output is captured and only shown if the install fails, since yarn writes
-# both its routine progress and its failure diagnostics to stdout.
 ensure_dependencies_installed() {
   local install_output
   if ! install_output="$(yarn install --immutable 2>&1)"; then
@@ -105,7 +76,7 @@ ensure_dependencies_installed() {
   fi
 }
 
-cd_to_repo_root
+cd_to_project_root
 add_local_bin_to_path
 load_nvm
 use_pinned_node_version
