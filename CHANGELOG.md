@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Simplified `README.md` to a short intro that links to `example/`.
+
 ## 1.0.0
 
 - Added a minimal `example/` project that uses the kit.
