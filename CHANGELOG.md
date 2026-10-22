@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.0
 
 - Simplified `README.md` to a short intro that links to `example/`.
 
