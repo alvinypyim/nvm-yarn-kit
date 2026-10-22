@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+kit="$root/.nvm-yarn-kit"
+
+[ -d "$kit" ] || git clone --quiet --depth 1 --branch v0.1.0 \
+  https://github.com/alvinypyim/nvm-yarn-kit.git "$kit"
+
+exec "$kit/bin/exec" "$@"

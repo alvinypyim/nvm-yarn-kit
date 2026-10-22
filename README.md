@@ -14,4 +14,7 @@ echo '/.nvm-yarn-kit' >> .gitignore
 - `bin/yarn` runs `yarn`.
 - `bin/exec` runs `yarn install --immutable`, then the given command.
 
+See [example/](example) for a minimal project that uses the kit
+(`cd example && bin/exec node src/start.js`).
+
 Requires bash. nvm and Corepack are optional.
